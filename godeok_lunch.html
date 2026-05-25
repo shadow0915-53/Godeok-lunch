@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>고덕중학교 급식 메뉴</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: #f5f5f0; min-height: 100vh; display: flex; justify-content: center; padding: 2rem 1rem; }
+    .wrap { width: 100%; max-width: 480px; }
+
+    .header { background: #fff; border-radius: 16px; padding: 1.5rem; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .header-left h1 { font-size: 20px; font-weight: 700; color: #111; margin-bottom: 2px; }
+    .header-left span { font-size: 12px; color: #888; }
+    .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+    .nav-row { display: flex; align-items: center; gap: 6px; }
+    .nav-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid #e0e0e0; background: #fff; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; color: #333; }
+    .nav-btn:hover { background: #f0f0ec; }
+    .date-label { font-size: 13px; font-weight: 600; color: #111; min-width: 120px; text-align: center; }
+    .today-btn { font-size: 11px; border: 1px solid #e0e0e0; border-radius: 6px; padding: 3px 10px; background: #fff; cursor: pointer; color: #666; }
+    .today-btn:hover { background: #f0f0ec; }
+
+    .card { background: #fff; border-radius: 14px; padding: 1.25rem; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .meal-badge { display: inline-flex; align-items: center; gap: 5px; background: #e8f5f0; color: #0f6e56; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
+    .meal-dot { width: 5px; height: 5px; border-radius: 50%; background: #1D9E75; }
+    .menu-list { list-style: none; }
+    .menu-item { font-size: 15px; color: #222; padding: 6px 0; border-bottom: 1px solid #f0f0ec; display: flex; align-items: center; gap: 8px; }
+    .menu-item::before { content: "•"; color: #1D9E75; font-size: 12px; flex-shrink: 0; }
+    .menu-item:last-child { border-bottom: none; }
+    .cal-row { margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0ec; font-size: 12px; color: #888; }
+    .cal-row strong { color: #444; }
+
+    .empty-box { background: #fff; border-radius: 14px; padding: 3rem 1.5rem; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .empty-icon { font-size: 36px; margin-bottom: 12px; }
+    .empty-msg { font-size: 15px; color: #555; margin-bottom: 6px; }
+    .empty-sub { font-size: 12px; color: #aaa; }
+
+    .loading { text-align: center; padding: 3rem; color: #888; font-size: 14px; }
+    .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid #e0e0e0; border-top-color: #1D9E75; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .note { font-size: 11px; color: #aaa; margin-top: 1rem; text-align: center; line-height: 1.6; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="header-left">
+      <h1>🍱 오늘의 급식</h1>
+      <span>서울 고덕중학교</span>
+    </div>
+    <div class="header-right">
+      <div class="nav-row">
+        <button class="nav-btn" id="prevBtn">&#8249;</button>
+        <span class="date-label" id="dateLabel">--</span>
+        <button class="nav-btn" id="nextBtn">&#8250;</button>
+      </div>
+      <button class="today-btn" id="todayBtn">오늘로 돌아가기</button>
+    </div>
+  </div>
+  <div id="content"><div class="loading"><span class="spinner"></span>급식 정보를 불러오는 중...</div></div>
+  <div class="note">데이터 출처: 나이스(NEIS) 교육정보 개방 포털<br>developed by Y&amp;D Kims</div>
+</div>
+
+<script>
+const API_KEY = 'd0a1e7af9c504e38a5724e23b6f7297a';
+const ATPT_CODE = 'B10';
+let SCHOOL_CODE = null;
+let currentDate = new Date();
+let cbIdx = 0;
+
+function fmtDate(d) {
+  return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+}
+function fmtLabel(d) {
+  const days = ['일','월','화','수','목','금','토'];
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} (${days[d.getDay()]})`;
+}
+
+function jsonp(url) {
+  return new Promise((resolve, reject) => {
+    const cb = `__cb${cbIdx++}`;
+    const script = document.createElement('script');
+    const timer = setTimeout(() => {
+      cleanup(); reject(new Error('시간 초과'));
+    }, 8000);
+    function cleanup() {
+      delete window[cb];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+    window[cb] = (data) => { clearTimeout(timer); cleanup(); resolve(data); };
+    script.onerror = () => { clearTimeout(timer); cleanup(); reject(new Error('네트워크 오류')); };
+    script.src = url + `&callback=${cb}`;
+    document.body.appendChild(script);
+  });
+}
+
+async function getSchoolCode() {
+  if (SCHOOL_CODE) return SCHOOL_CODE;
+  const data = await jsonp(
+    `https://open.neis.go.kr/hub/schoolInfo?KEY=${API_KEY}&Type=jsonp&ATPT_OFCDC_SC_CODE=${ATPT_CODE}&SCHUL_NM=%EA%B3%A0%EB%8D%95%EC%A4%91%ED%95%99%EA%B5%90`
+  );
+  const rows = data?.schoolInfo?.[1]?.row;
+  if (!rows?.length) throw new Error('학교 코드를 찾지 못했어요');
+  SCHOOL_CODE = (rows.find(r => r.SCHUL_NM === '고덕중학교') || rows[0]).SD_SCHUL_CODE;
+  return SCHOOL_CODE;
+}
+
+async function fetchMeal(dateStr) {
+  const code = await getSchoolCode();
+  const data = await jsonp(
+    `https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=${API_KEY}&Type=jsonp&ATPT_OFCDC_SC_CODE=${ATPT_CODE}&SD_SCHUL_CODE=${code}&MLSV_YMD=${dateStr}`
+  );
+  if (data.RESULT) return [];
+  return data?.mealServiceDietInfo?.[1]?.row || [];
+}
+
+function parseItems(ddish) {
+  return ddish.split('<br/>').map(s => s.replace(/\s*\([^)]*\)/g,'').trim()).filter(Boolean);
+}
+
+function renderMeal(rows) {
+  document.getElementById('dateLabel').textContent = fmtLabel(currentDate);
+  const el = document.getElementById('content');
+  if (!rows.length) {
+    const isWeekend = [0,6].includes(currentDate.getDay());
+    el.innerHTML = `<div class="empty-box">
+      <div class="empty-icon">${isWeekend ? '🏠' : '📭'}</div>
+      <div class="empty-msg">${isWeekend ? '주말에는 급식이 없어요' : '이 날의 급식 정보가 없어요'}</div>
+      <div class="empty-sub">${isWeekend ? '평일을 선택해 보세요' : '방학이거나 아직 등록 전일 수 있어요'}</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML = rows.map(row => `
+    <div class="card">
+      <div class="meal-badge"><span class="meal-dot"></span>${row.MMEAL_SC_NM}</div>
+      <ul class="menu-list">
+        ${parseItems(row.DDISH_NM).map(item => `<li class="menu-item">${item}</li>`).join('')}
+      </ul>
+      ${row.CAL_INFO ? `<div class="cal-row">열량: <strong>${row.CAL_INFO}</strong></div>` : ''}
+    </div>
+  `).join('');
+}
+
+async function load() {
+  document.getElementById('dateLabel').textContent = fmtLabel(currentDate);
+  document.getElementById('content').innerHTML = '<div class="loading"><span class="spinner"></span>불러오는 중...</div>';
+  try {
+    renderMeal(await fetchMeal(fmtDate(currentDate)));
+  } catch(e) {
+    document.getElementById('content').innerHTML = `<div class="empty-box">
+      <div class="empty-icon">📡</div>
+      <div class="empty-msg">불러오지 못했어요</div>
+      <div class="empty-sub">${e.message}</div>
+    </div>`;
+  }
+}
+
+document.getElementById('prevBtn').onclick = () => { currentDate.setDate(currentDate.getDate()-1); load(); };
+document.getElementById('nextBtn').onclick = () => { currentDate.setDate(currentDate.getDate()+1); load(); };
+document.getElementById('todayBtn').onclick = () => { currentDate = new Date(); load(); };
+load();
+</script>
+</body>
+</html>

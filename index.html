@@ -6,60 +6,127 @@
   <title>고덕중학교 급식 메뉴</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: #f5f5f0; min-height: 100vh; display: flex; justify-content: center; padding: 2rem 1rem; }
+    body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: #fffbe8; min-height: 100vh; display: flex; justify-content: center; padding: 1.5rem 1rem 3rem; }
     .wrap { width: 100%; max-width: 480px; }
 
-    .header { background: #fff; border-radius: 16px; padding: 1.5rem; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-    .header-left h1 { font-size: 20px; font-weight: 700; color: #111; margin-bottom: 2px; }
-    .header-left span { font-size: 12px; color: #888; }
-    .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-    .nav-row { display: flex; align-items: center; gap: 6px; }
-    .nav-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid #e0e0e0; background: #fff; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; color: #333; }
-    .nav-btn:hover { background: #f0f0ec; }
-    .date-label { font-size: 13px; font-weight: 600; color: #111; min-width: 120px; text-align: center; }
-    .today-btn { font-size: 11px; border: 1px solid #e0e0e0; border-radius: 6px; padding: 3px 10px; background: #fff; cursor: pointer; color: #666; }
-    .today-btn:hover { background: #f0f0ec; }
+    /* ── 헤더 ── */
+    .header { background: linear-gradient(135deg, #ffe066 0%, #ffd43b 100%); border-radius: 20px; padding: 1.4rem 1.5rem 1.2rem; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(255,200,0,0.25); position: relative; overflow: hidden; }
+    .header::after { content: ''; position: absolute; right: -20px; top: -20px; width: 120px; height: 120px; background: rgba(255,255,255,0.15); border-radius: 50%; }
+    .header-left h1 { font-size: 20px; font-weight: 800; color: #3d2c00; margin-bottom: 2px; }
+    .header-left .sub { font-size: 12px; color: #7a5c00; }
+    .duck-wrap { position: relative; z-index: 1; }
 
-    .card { background: #fff; border-radius: 14px; padding: 1.25rem; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-    .meal-badge { display: inline-flex; align-items: center; gap: 5px; background: #e8f5f0; color: #0f6e56; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
-    .meal-dot { width: 5px; height: 5px; border-radius: 50%; background: #1D9E75; }
-    .menu-list { list-style: none; }
-    .menu-item { font-size: 15px; color: #222; padding: 6px 0; border-bottom: 1px solid #f0f0ec; display: flex; align-items: center; gap: 8px; }
-    .menu-item::before { content: "•"; color: #1D9E75; font-size: 12px; flex-shrink: 0; }
+    /* ── 날짜 네비 ── */
+    .nav-card { background: #fff; border-radius: 14px; padding: 0.9rem 1rem; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+    .nav-row { display: flex; align-items: center; gap: 8px; }
+    .nav-btn { width: 34px; height: 34px; border-radius: 10px; border: 1.5px solid #ffe066; background: #fffbe8; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; color: #3d2c00; transition: background 0.15s; }
+    .nav-btn:hover { background: #ffe066; }
+    .date-label { font-size: 14px; font-weight: 700; color: #222; min-width: 126px; text-align: center; }
+    .today-btn { font-size: 11px; border: 1.5px solid #ffe066; border-radius: 8px; padding: 4px 12px; background: #fffbe8; cursor: pointer; color: #7a5c00; font-weight: 600; }
+    .today-btn:hover { background: #ffe066; }
+
+    /* ── 급식 카드 ── */
+    .card { background: #fff; border-radius: 18px; padding: 1.3rem; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); border: 1.5px solid #fff5cc; }
+    .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+    .meal-badge { display: inline-flex; align-items: center; gap: 5px; background: #fff5cc; color: #a07800; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; }
+    .meal-icon { font-size: 16px; }
+    .cal-badge { margin-left: auto; font-size: 11px; color: #e07b00; background: #fff0e0; padding: 3px 10px; border-radius: 12px; font-weight: 600; }
+
+    .menu-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+    .menu-item { font-size: 15px; color: #222; padding: 7px 4px; border-bottom: 1px dashed #f5e8a0; display: flex; align-items: center; gap: 10px; }
     .menu-item:last-child { border-bottom: none; }
-    .cal-row { margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0ec; font-size: 12px; color: #888; }
-    .cal-row strong { color: #444; }
+    .menu-item .food-emoji { font-size: 18px; flex-shrink: 0; }
+    .menu-item .food-name { flex: 1; line-height: 1.4; }
 
-    .empty-box { background: #fff; border-radius: 14px; padding: 3rem 1.5rem; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-    .empty-icon { font-size: 36px; margin-bottom: 12px; }
-    .empty-msg { font-size: 15px; color: #555; margin-bottom: 6px; }
+    /* ── 빈 상태 ── */
+    .empty-box { background: #fff; border-radius: 18px; padding: 3rem 1.5rem; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+    .empty-duck { margin-bottom: 12px; }
+    .empty-msg { font-size: 15px; color: #555; font-weight: 600; margin-bottom: 6px; }
     .empty-sub { font-size: 12px; color: #aaa; }
 
-    .loading { text-align: center; padding: 3rem; color: #888; font-size: 14px; }
-    .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid #e0e0e0; border-top-color: #1D9E75; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
+    /* ── 로딩 ── */
+    .loading { text-align: center; padding: 3rem; color: #a07800; font-size: 14px; font-weight: 500; }
+    .spinner { display: inline-block; width: 20px; height: 20px; border: 2.5px solid #ffe066; border-top-color: #ffa500; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .note { font-size: 11px; color: #aaa; margin-top: 1rem; text-align: center; line-height: 1.6; }
+    /* ── 하단 ── */
+    .footer { text-align: center; margin-top: 1.2rem; font-size: 11px; color: #bbb; line-height: 1.8; }
+    .footer strong { color: #999; }
   </style>
 </head>
 <body>
 <div class="wrap">
+
+  <!-- 헤더 -->
   <div class="header">
     <div class="header-left">
       <h1>🍱 오늘의 급식</h1>
-      <span>서울 고덕중학교</span>
+      <div class="sub">서울 고덕중학교</div>
     </div>
-    <div class="header-right">
-      <div class="nav-row">
-        <button class="nav-btn" id="prevBtn">&#8249;</button>
-        <span class="date-label" id="dateLabel">--</span>
-        <button class="nav-btn" id="nextBtn">&#8250;</button>
-      </div>
-      <button class="today-btn" id="todayBtn">오늘로 돌아가기</button>
+    <div class="duck-wrap">
+      <!-- 귀여운 고덕 오리 캐릭터 (직접 그린 SVG) -->
+      <svg width="82" height="82" viewBox="0 0 82 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- 그림자 -->
+        <ellipse cx="41" cy="76" rx="22" ry="5" fill="rgba(0,0,0,0.08)"/>
+        <!-- 몸통 -->
+        <ellipse cx="41" cy="54" rx="22" ry="18" fill="#FFD43B"/>
+        <!-- 날개 왼 -->
+        <ellipse cx="20" cy="56" rx="8" ry="11" fill="#FCC419" transform="rotate(-15 20 56)"/>
+        <!-- 날개 오른 -->
+        <ellipse cx="62" cy="56" rx="8" ry="11" fill="#FCC419" transform="rotate(15 62 56)"/>
+        <!-- 배 흰색 -->
+        <ellipse cx="41" cy="57" rx="13" ry="12" fill="#FFFDE7"/>
+        <!-- 머리 -->
+        <circle cx="41" cy="32" r="17" fill="#FFD43B"/>
+        <!-- 눈 흰자 왼 -->
+        <circle cx="34" cy="29" r="5" fill="white"/>
+        <!-- 눈 흰자 오른 -->
+        <circle cx="48" cy="29" r="5" fill="white"/>
+        <!-- 눈동자 왼 -->
+        <circle cx="35" cy="30" r="3" fill="#222"/>
+        <!-- 눈동자 오른 -->
+        <circle cx="49" cy="30" r="3" fill="#222"/>
+        <!-- 반짝이 왼 -->
+        <circle cx="36" cy="28.5" r="1" fill="white"/>
+        <!-- 반짝이 오른 -->
+        <circle cx="50" cy="28.5" r="1" fill="white"/>
+        <!-- 부리 -->
+        <path d="M36 37 Q41 43 46 37 Q41 35 36 37Z" fill="#FF922B"/>
+        <!-- 볼터치 왼 -->
+        <ellipse cx="29" cy="34" rx="4" ry="2.5" fill="#FFB3A7" opacity="0.7"/>
+        <!-- 볼터치 오른 -->
+        <ellipse cx="53" cy="34" rx="4" ry="2.5" fill="#FFB3A7" opacity="0.7"/>
+        <!-- 머리 위 삐침 -->
+        <path d="M41 15 Q44 8 47 11 Q44 13 41 15Z" fill="#FCC419"/>
+        <!-- 발 왼 -->
+        <path d="M32 70 Q28 74 25 72 Q27 70 29 70 Q27 68 24 67 Q28 66 31 68 Q30 65 28 63 Q33 64 33 68Z" fill="#FF922B"/>
+        <!-- 발 오른 -->
+        <path d="M50 70 Q54 74 57 72 Q55 70 53 70 Q55 68 58 67 Q54 66 51 68 Q52 65 54 63 Q49 64 49 68Z" fill="#FF922B"/>
+        <!-- 밥그릇 -->
+        <rect x="25" y="60" width="14" height="2" rx="1" fill="#FF922B" opacity="0.5"/>
+      </svg>
     </div>
   </div>
-  <div id="content"><div class="loading"><span class="spinner"></span>급식 정보를 불러오는 중...</div></div>
-  <div class="note">데이터 출처: 나이스(NEIS) 교육정보 개방 포털<br>developed by Y&amp;D Kims</div>
+
+  <!-- 날짜 네비 -->
+  <div class="nav-card">
+    <div class="nav-row">
+      <button class="nav-btn" id="prevBtn" aria-label="이전 날">&#8249;</button>
+      <span class="date-label" id="dateLabel">--</span>
+      <button class="nav-btn" id="nextBtn" aria-label="다음 날">&#8250;</button>
+    </div>
+    <button class="today-btn" id="todayBtn">오늘로</button>
+  </div>
+
+  <!-- 급식 내용 -->
+  <div id="content">
+    <div class="loading"><span class="spinner"></span>꽥꽥, 급식 불러오는 중...</div>
+  </div>
+
+  <div class="footer">
+    데이터 출처: 나이스(NEIS) 교육정보 개방 포털<br>
+    <strong>developed by Y&amp;D Kims</strong>
+  </div>
 </div>
 
 <script>
@@ -68,6 +135,39 @@ const ATPT_CODE = 'B10';
 let SCHOOL_CODE = null;
 let currentDate = new Date();
 let cbIdx = 0;
+
+const FOOD_EMOJI = {
+  '밥':['🍚','밥','흰쌀','잡곡','현미','보리'],
+  '국':['🍲','국','탕','찌개','된장','미역','순두부','김치찌개'],
+  '고기':['🥩','불고기','갈비','제육','돼지','소고기','닭','삼겹','스테이크','육'],
+  '생선':['🐟','생선','고등어','조기','명태','동태','갈치','연어','참치','새우','오징어','낙지'],
+  '튀김':['🍗','튀김','까스','카스','탕수','강정','치킨','너겟','돈까스','돈가스'],
+  '면':['🍜','면','국수','라면','우동','짜장','스파게티','파스타','쌀국수'],
+  '김치':['🥬','김치','깍두기','총각','나박','열무'],
+  '나물':['🥦','나물','시금치','콩나물','무침','숙주','도라지','고사리'],
+  '볶음':['🥘','볶음','볶음밥','비빔'],
+  '샐러드':['🥗','샐러드','무쌈','채소'],
+  '과일':['🍎','과일','사과','배','귤','바나나','수박','참외','포도','딸기','망고'],
+  '빵':['🍞','빵','식빵','롤','크루아상','모닝빵'],
+  '떡':['🍡','떡','떡볶이','인절미','송편'],
+  '수프':['🥣','수프','크림','포타주'],
+  '달걀':['🍳','계란','달걀','에그','후라이','스크램블'],
+  '두부':['🫘','두부','순두부'],
+  '카레':['🍛','카레','커리'],
+  '피자':['🍕','피자'],
+  '초밥':['🍣','초밥','스시'],
+  '기본':['🍽️']
+};
+
+function getEmoji(name) {
+  for (const [, arr] of Object.entries(FOOD_EMOJI)) {
+    const emoji = arr[0];
+    for (let i = 1; i < arr.length; i++) {
+      if (name.includes(arr[i])) return emoji;
+    }
+  }
+  return '🍽️';
+}
 
 function fmtDate(d) {
   return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
@@ -81,13 +181,8 @@ function jsonp(url) {
   return new Promise((resolve, reject) => {
     const cb = `__cb${cbIdx++}`;
     const script = document.createElement('script');
-    const timer = setTimeout(() => {
-      cleanup(); reject(new Error('시간 초과'));
-    }, 8000);
-    function cleanup() {
-      delete window[cb];
-      if (script.parentNode) script.parentNode.removeChild(script);
-    }
+    const timer = setTimeout(() => { cleanup(); reject(new Error('시간 초과')); }, 8000);
+    function cleanup() { delete window[cb]; if (script.parentNode) script.parentNode.removeChild(script); }
     window[cb] = (data) => { clearTimeout(timer); cleanup(); resolve(data); };
     script.onerror = () => { clearTimeout(timer); cleanup(); reject(new Error('네트워크 오류')); };
     script.src = url + `&callback=${cb}`;
@@ -97,9 +192,7 @@ function jsonp(url) {
 
 async function getSchoolCode() {
   if (SCHOOL_CODE) return SCHOOL_CODE;
-  const data = await jsonp(
-    `https://open.neis.go.kr/hub/schoolInfo?KEY=${API_KEY}&Type=jsonp&ATPT_OFCDC_SC_CODE=${ATPT_CODE}&SCHUL_NM=%EA%B3%A0%EB%8D%95%EC%A4%91%ED%95%99%EA%B5%90`
-  );
+  const data = await jsonp(`https://open.neis.go.kr/hub/schoolInfo?KEY=${API_KEY}&Type=jsonp&ATPT_OFCDC_SC_CODE=${ATPT_CODE}&SCHUL_NM=%EA%B3%A0%EB%8D%95%EC%A4%91%ED%95%99%EA%B5%90`);
   const rows = data?.schoolInfo?.[1]?.row;
   if (!rows?.length) throw new Error('학교 코드를 찾지 못했어요');
   SCHOOL_CODE = (rows.find(r => r.SCHUL_NM === '고덕중학교') || rows[0]).SD_SCHUL_CODE;
@@ -108,9 +201,7 @@ async function getSchoolCode() {
 
 async function fetchMeal(dateStr) {
   const code = await getSchoolCode();
-  const data = await jsonp(
-    `https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=${API_KEY}&Type=jsonp&ATPT_OFCDC_SC_CODE=${ATPT_CODE}&SD_SCHUL_CODE=${code}&MLSV_YMD=${dateStr}`
-  );
+  const data = await jsonp(`https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=${API_KEY}&Type=jsonp&ATPT_OFCDC_SC_CODE=${ATPT_CODE}&SD_SCHUL_CODE=${code}&MLSV_YMD=${dateStr}`);
   if (data.RESULT) return [];
   return data?.mealServiceDietInfo?.[1]?.row || [];
 }
@@ -119,40 +210,39 @@ function parseItems(ddish) {
   return ddish.split('<br/>').map(s => s.replace(/\s*\([^)]*\)/g,'').trim()).filter(Boolean);
 }
 
+const DUCK_SAD = `<svg width="64" height="64" viewBox="0 0 82 82" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="41" cy="76" rx="22" ry="5" fill="rgba(0,0,0,0.08)"/><ellipse cx="41" cy="54" rx="22" ry="18" fill="#ccc"/><ellipse cx="20" cy="56" rx="8" ry="11" fill="#bbb" transform="rotate(-15 20 56)"/><ellipse cx="62" cy="56" rx="8" ry="11" fill="#bbb" transform="rotate(15 62 56)"/><ellipse cx="41" cy="57" rx="13" ry="12" fill="#FFFDE7"/><circle cx="41" cy="32" r="17" fill="#ccc"/><circle cx="34" cy="29" r="5" fill="white"/><circle cx="48" cy="29" r="5" fill="white"/><circle cx="35" cy="30" r="3" fill="#222"/><circle cx="49" cy="30" r="3" fill="#222"/><circle cx="36" cy="28.5" r="1" fill="white"/><circle cx="50" cy="28.5" r="1" fill="white"/><path d="M38 40 Q41 37 44 40" stroke="#FF922B" stroke-width="2" fill="none" stroke-linecap="round"/><ellipse cx="29" cy="34" rx="4" ry="2.5" fill="#FFB3A7" opacity="0.7"/><ellipse cx="53" cy="34" rx="4" ry="2.5" fill="#FFB3A7" opacity="0.7"/></svg>`;
+
 function renderMeal(rows) {
   document.getElementById('dateLabel').textContent = fmtLabel(currentDate);
   const el = document.getElementById('content');
   if (!rows.length) {
     const isWeekend = [0,6].includes(currentDate.getDay());
-    el.innerHTML = `<div class="empty-box">
-      <div class="empty-icon">${isWeekend ? '🏠' : '📭'}</div>
-      <div class="empty-msg">${isWeekend ? '주말에는 급식이 없어요' : '이 날의 급식 정보가 없어요'}</div>
-      <div class="empty-sub">${isWeekend ? '평일을 선택해 보세요' : '방학이거나 아직 등록 전일 수 있어요'}</div>
-    </div>`;
+    el.innerHTML = `<div class="empty-box"><div class="empty-duck">${DUCK_SAD}</div><div class="empty-msg">${isWeekend ? '주말엔 급식이 없어요 🏠' : '이 날의 급식 정보가 없어요'}</div><div class="empty-sub">${isWeekend ? '평일을 선택해 보세요' : '방학이거나 아직 등록 전일 수 있어요'}</div></div>`;
     return;
   }
-  el.innerHTML = rows.map(row => `
-    <div class="card">
-      <div class="meal-badge"><span class="meal-dot"></span>${row.MMEAL_SC_NM}</div>
+  el.innerHTML = rows.map(row => {
+    const items = parseItems(row.DDISH_NM);
+    const cal = row.CAL_INFO || '';
+    const mealEmoji = row.MMEAL_SC_NM.includes('중') ? '🌞' : row.MMEAL_SC_NM.includes('석') ? '🌙' : '🌅';
+    return `<div class="card">
+      <div class="card-header">
+        <div class="meal-badge"><span class="meal-icon">${mealEmoji}</span>${row.MMEAL_SC_NM}</div>
+        ${cal ? `<div class="cal-badge">🔥 ${cal}</div>` : ''}
+      </div>
       <ul class="menu-list">
-        ${parseItems(row.DDISH_NM).map(item => `<li class="menu-item">${item}</li>`).join('')}
+        ${items.map(item => `<li class="menu-item"><span class="food-emoji">${getEmoji(item)}</span><span class="food-name">${item}</span></li>`).join('')}
       </ul>
-      ${row.CAL_INFO ? `<div class="cal-row">열량: <strong>${row.CAL_INFO}</strong></div>` : ''}
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 async function load() {
   document.getElementById('dateLabel').textContent = fmtLabel(currentDate);
-  document.getElementById('content').innerHTML = '<div class="loading"><span class="spinner"></span>불러오는 중...</div>';
+  document.getElementById('content').innerHTML = '<div class="loading"><span class="spinner"></span>꽥꽥, 급식 불러오는 중...</div>';
   try {
     renderMeal(await fetchMeal(fmtDate(currentDate)));
   } catch(e) {
-    document.getElementById('content').innerHTML = `<div class="empty-box">
-      <div class="empty-icon">📡</div>
-      <div class="empty-msg">불러오지 못했어요</div>
-      <div class="empty-sub">${e.message}</div>
-    </div>`;
+    document.getElementById('content').innerHTML = `<div class="empty-box"><div class="empty-duck">${DUCK_SAD}</div><div class="empty-msg">불러오지 못했어요</div><div class="empty-sub">${e.message}</div></div>`;
   }
 }
 
